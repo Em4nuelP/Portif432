@@ -1,4 +1,4 @@
-import { ProfileData, Project, Experience } from './types';
+import { ProfileData, Project, Experience, Education, Certification } from './types';
 
 export const PROFILE_DATA: ProfileData = {
   name: "ALEXANDRE SILVA",
@@ -12,6 +12,48 @@ export const PROFILE_DATA: ProfileData = {
     email: "contato@alexandresilva.dev"
   }
 };
+
+export const SKILLS: string[] = [
+  "Power BI", "SQL Server", "Python (Pandas, NumPy)", "ETL / ELT", 
+  "Data Warehousing", "DAX", "Google Analytics", "Azure Data Factory", 
+  "Tableau", "Git", "Excel Avançado / VBA"
+];
+
+export const EDUCATION: Education[] = [
+  {
+    id: "e1",
+    degree: "Pós-graduação em Data Science",
+    institution: "Universidade Tecnológica",
+    period: "2020 - 2021"
+  },
+  {
+    id: "e2",
+    degree: "Bacharelado em Sistemas de Informação",
+    institution: "Faculdade Estadual",
+    period: "2015 - 2019"
+  }
+];
+
+export const CERTIFICATIONS: Certification[] = [
+  {
+    id: "c1",
+    name: "Microsoft Certified: Power BI Data Analyst Associate",
+    issuer: "Microsoft",
+    year: "2022"
+  },
+  {
+    id: "c2",
+    name: "Google Data Analytics Professional Certificate",
+    issuer: "Coursera / Google",
+    year: "2021"
+  },
+  {
+    id: "c3",
+    name: "AWS Certified Cloud Practitioner",
+    issuer: "Amazon Web Services",
+    year: "2020"
+  }
+];
 
 export const EXPERIENCES: Experience[] = [
   {

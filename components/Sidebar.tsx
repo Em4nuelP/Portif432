@@ -23,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
     <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-white dark:bg-[#1f2937] border-r border-gray-200 dark:border-gray-800 z-50">
       
       {/* Header with Banner & Profile */}
-      <div className="relative mb-16">
+      <div className="relative mb-14">
         <div className="h-24 w-full overflow-hidden">
             <img src={profile.banner} alt="Banner" className="w-full h-full object-cover" />
         </div>
@@ -37,14 +37,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
       </div>
 
       <div className="px-6 mb-8">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-tight">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-none mb-1">
             {profile.name}
         </h1>
-        <div className="inline-block mt-2 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
-            <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-                {profile.role}
-            </span>
-        </div>
+        <span className="text-sm font-semibold text-primary dark:text-primary-dark uppercase tracking-wide">
+            {profile.role}
+        </span>
       </div>
 
       {/* Navigation */}

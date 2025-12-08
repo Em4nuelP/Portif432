@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Theme, ViewState, Project, ProfileData, Experience } from './types';
+import { Theme, ViewState, Project, ProfileData, Experience, Education, Certification } from './types';
 import { fetchPortfolioData } from './services/dataService';
 import Layout from './components/Layout';
 import ProjectCard from './components/ProjectCard';
 import ProjectDetail from './components/ProjectDetail';
 import HeroMobile from './components/HeroMobile';
-import { Briefcase, User, Mail, Database, LineChart, Code } from 'lucide-react';
+import { Briefcase, User, Mail, Database, LineChart, Code, GraduationCap, Award, Cpu } from 'lucide-react';
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>('light'); // Default to light
@@ -16,7 +16,10 @@ const App: React.FC = () => {
       profile: ProfileData | null;
       projects: Project[];
       experiences: Experience[];
-  }>({ profile: null, projects: [], experiences: [] });
+      skills: string[];
+      education: Education[];
+      certifications: Certification[];
+  }>({ profile: null, projects: [], experiences: [], skills: [], education: [], certifications: [] });
 
   // Load Data
   useEffect(() => {
@@ -118,37 +121,105 @@ const App: React.FC = () => {
 
         case 'about':
             return (
-                <div>
+                <div className="space-y-12">
                      <HeroMobile profile={data.profile} />
-                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-                        <User className="text-primary dark:text-primary-dark" />
-                        Experiência
-                    </h2>
-                    
-                    <div className="space-y-8 relative pl-2">
-                        {/* Vertical Timeline Line */}
-                        <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+                     
+                     {/* Tech Stack */}
+                     <section>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                            <Cpu className="text-primary dark:text-primary-dark" />
+                            Tecnologias
+                        </h2>
+                        <div className="flex flex-wrap gap-3">
+                            {data.skills && data.skills.map((skill, index) => (
+                                <span key={index} className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-std text-gray-700 dark:text-gray-300 font-medium shadow-sm">
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                     </section>
 
-                        {data.experiences.map((exp, idx) => (
-                            <div key={exp.id} className="relative pl-8">
-                                {/* Timeline Dot */}
-                                <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 border-4 border-primary dark:border-primary-dark"></div>
-                                
-                                <div className="bg-white dark:bg-gray-800 p-6 rounded-std shadow-sm border border-gray-100 dark:border-gray-700">
-                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
-                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.role}</h3>
-                                        <span className="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                                            {exp.period}
-                                        </span>
+                     {/* Experience */}
+                     <section>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+                            <Briefcase className="text-primary dark:text-primary-dark" />
+                            Experiência Profissional
+                        </h2>
+                        
+                        <div className="space-y-8 relative pl-2">
+                            {/* Vertical Timeline Line */}
+                            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+
+                            {data.experiences.map((exp, idx) => (
+                                <div key={exp.id} className="relative pl-8">
+                                    {/* Timeline Dot */}
+                                    <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 border-4 border-primary dark:border-primary-dark"></div>
+                                    
+                                    <div className="bg-white dark:bg-gray-800 p-6 rounded-std shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.role}</h3>
+                                            <span className="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block w-fit mt-1 sm:mt-0">
+                                                {exp.period}
+                                            </span>
+                                        </div>
+                                        <h4 className="text-primary dark:text-primary-dark font-medium mb-3">{exp.company}</h4>
+                                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                            {exp.description}
+                                        </p>
                                     </div>
-                                    <h4 className="text-primary dark:text-primary-dark font-medium mb-3">{exp.company}</h4>
-                                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                                        {exp.description}
-                                    </p>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Education */}
+                    <section>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+                            <GraduationCap className="text-primary dark:text-primary-dark" />
+                            Formação Acadêmica
+                        </h2>
+                         <div className="space-y-8 relative pl-2">
+                            {/* Vertical Timeline Line */}
+                            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+
+                            {data.education && data.education.map((edu, idx) => (
+                                <div key={edu.id} className="relative pl-8">
+                                    <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 border-4 border-primary dark:border-primary-dark"></div>
+                                    <div className="bg-white dark:bg-gray-800 p-5 rounded-std shadow-sm border border-gray-100 dark:border-gray-700">
+                                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{edu.degree}</h3>
+                                            <span className="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block w-fit mt-1 sm:mt-0">
+                                                {edu.period}
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-600 dark:text-gray-300">{edu.institution}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Certifications */}
+                    <section>
+                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
+                            <Award className="text-primary dark:text-primary-dark" />
+                            Certificações
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {data.certifications && data.certifications.map(cert => (
+                                <div key={cert.id} className="p-4 bg-white dark:bg-gray-800 rounded-std border border-gray-100 dark:border-gray-700 shadow-sm flex items-start gap-3">
+                                    <div className="p-2 bg-primary/10 dark:bg-primary-dark/10 rounded-lg text-primary dark:text-primary-dark">
+                                        <Award size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 dark:text-white leading-tight mb-1">{cert.name}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{cert.issuer} • {cert.year}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
                 </div>
             );
 

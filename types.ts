@@ -21,6 +21,20 @@ export interface Experience {
   description: string;
 }
 
+export interface Education {
+  id: string;
+  degree: string;
+  institution: string;
+  period: string;
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  year: string;
+}
+
 export interface ProfileData {
   name: string;
   role: string;

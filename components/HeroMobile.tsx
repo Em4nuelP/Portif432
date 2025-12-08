@@ -17,10 +17,10 @@ const HeroMobile: React.FC<HeroMobileProps> = ({ profile }) => {
         <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
             Olá, eu sou
         </span>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white leading-none mb-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white leading-none mb-0.5">
             {profile.name.split(' ')[0]}
         </h1>
-        <p className="text-sm text-primary dark:text-primary-dark font-medium px-2 py-0.5 bg-primary/5 dark:bg-primary/20 rounded-full">
+        <p className="text-sm text-primary dark:text-primary-dark font-semibold uppercase tracking-wide">
             {profile.role}
         </p>
       </div>

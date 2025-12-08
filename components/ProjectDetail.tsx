@@ -24,7 +24,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack }) => {
       </div>
 
       {/* Hero Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <div className="lg:col-span-2">
             <div 
                 className="aspect-video w-full rounded-std overflow-hidden shadow-sm cursor-pointer"
@@ -66,19 +66,9 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack }) => {
         </div>
       </div>
 
-      {/* Description */}
-      <div className="mb-12">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-            Sobre o Projeto
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
-            {project.description}
-        </p>
-      </div>
-
-      {/* Gallery */}
+      {/* Gallery (Moved UP) */}
       {project.images.length > 0 && (
-          <div>
+          <div className="mb-12">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Galeria</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {project.images.map((img, idx) => (
@@ -93,6 +83,16 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack }) => {
             </div>
           </div>
       )}
+
+      {/* Description */}
+      <div className="mb-12">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            Sobre o Projeto
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">
+            {project.description}
+        </p>
+      </div>
 
       {/* Image Modal */}
       {selectedImage && (
