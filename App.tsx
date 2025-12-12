@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Theme, ViewState, Project, ProfileData, Experience, Education, Certification } from './types';
+import { Theme, ViewState, Project, ProfileData, Experience, Education, Certification, Course } from './types';
 import { fetchPortfolioData } from './services/dataService';
 import Layout from './components/Layout';
 import ProjectCard from './components/ProjectCard';
 import ProjectDetail from './components/ProjectDetail';
 import HeroMobile from './components/HeroMobile';
-import { Briefcase, User, Mail, Database, LineChart, Code, GraduationCap, Award, Cpu } from 'lucide-react';
+import { Briefcase, Mail, Database, LineChart, Code, Filter, Circle, User } from 'lucide-react';
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>('light'); // Default to light
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [activeTechFilter, setActiveTechFilter] = useState<string>('Todos');
   
   const [data, setData] = useState<{
       profile: ProfileData | null;
@@ -19,7 +20,8 @@ const App: React.FC = () => {
       skills: string[];
       education: Education[];
       certifications: Certification[];
-  }>({ profile: null, projects: [], experiences: [], skills: [], education: [], certifications: [] });
+      courses: Course[];
+  }>({ profile: null, projects: [], experiences: [], skills: [], education: [], certifications: [], courses: [] });
 
   // Load Data
   useEffect(() => {
@@ -54,9 +56,19 @@ const App: React.FC = () => {
   const handleNavigate = (view: ViewState) => {
     setSelectedProject(null);
     setCurrentView(view);
+    setActiveTechFilter('Todos'); // Reset filter when navigating
   };
 
   if (!data.profile) return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-400">Loading...</div>;
+
+  // Filter Logic
+  // Extract unique technologies, sort them alphabetically, and then prepend 'Todos'
+  const uniqueTechs = Array.from(new Set(data.projects.flatMap(p => p.technologies))).sort();
+  const allTechnologies = ['Todos', ...uniqueTechs];
+  
+  const filteredProjects = activeTechFilter === 'Todos' 
+    ? data.projects 
+    : data.projects.filter(p => p.technologies.includes(activeTechFilter));
 
   // Views Content
   const renderContent = () => {
@@ -120,105 +132,131 @@ const App: React.FC = () => {
             );
 
         case 'about':
+             // Helper for Section Headers
+             const SectionHeader = ({ title }: { title: string }) => (
+                <div className="flex items-center mb-6 border-l-4 border-primary dark:border-primary-dark pl-4">
+                    <h2 className="text-xl font-bold text-primary dark:text-white">
+                        {title}
+                    </h2>
+                </div>
+             );
+
+             // Helper for List Items (Education, Certs, Courses)
+             const ListItem = ({ title, subtitle, date }: { title: string, subtitle: string, date: string }) => (
+                <div className="flex items-start gap-4">
+                    <Circle className="mt-1.5 shrink-0 text-primary dark:text-primary-dark" size={14} strokeWidth={3} />
+                    <div>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                            {title}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {subtitle}
+                        </p>
+                        <span className="text-xs text-gray-400 dark:text-gray-500 mt-1 block">
+                            {date}
+                        </span>
+                    </div>
+                </div>
+             );
+
             return (
-                <div className="space-y-12">
+                <div className="animate-in fade-in duration-300 max-w-5xl">
                      <HeroMobile profile={data.profile} />
+
+                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
+                        <User className="text-primary dark:text-primary-dark" />
+                        Sobre
+                    </h2>
                      
-                     {/* Tech Stack */}
-                     <section>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                            <Cpu className="text-primary dark:text-primary-dark" />
-                            Tecnologias
-                        </h2>
-                        <div className="flex flex-wrap gap-3">
-                            {data.skills && data.skills.map((skill, index) => (
-                                <span key={index} className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-std text-gray-700 dark:text-gray-300 font-medium shadow-sm">
-                                    {skill}
-                                </span>
-                            ))}
-                        </div>
-                     </section>
+                     <div className="space-y-12">
+                        {/* 1. Resumo */}
+                        <section>
+                            <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed text-justify">
+                                {data.profile.bio} Tenho forte background em análise estatística e desenvolvimento de soluções de dados escaláveis. Meu foco é entregar valor real ao negócio, garantindo integridade e acessibilidade da informação.
+                            </p>
+                        </section>
 
-                     {/* Experience */}
-                     <section>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-                            <Briefcase className="text-primary dark:text-primary-dark" />
-                            Experiência Profissional
-                        </h2>
-                        
-                        <div className="space-y-8 relative pl-2">
-                            {/* Vertical Timeline Line */}
-                            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+                        {/* 2. Formação */}
+                        <section>
+                            <SectionHeader title="Formação" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+                                {data.education && data.education.map((edu) => (
+                                    <ListItem 
+                                        key={edu.id}
+                                        title={edu.degree}
+                                        subtitle={edu.institution}
+                                        date={edu.period}
+                                    />
+                                ))}
+                            </div>
+                        </section>
 
-                            {data.experiences.map((exp, idx) => (
-                                <div key={exp.id} className="relative pl-8">
-                                    {/* Timeline Dot */}
-                                    <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 border-4 border-primary dark:border-primary-dark"></div>
-                                    
-                                    <div className="bg-white dark:bg-gray-800 p-6 rounded-std shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
-                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{exp.role}</h3>
-                                            <span className="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block w-fit mt-1 sm:mt-0">
-                                                {exp.period}
-                                            </span>
+                        {/* 3. Certificações */}
+                        <section>
+                            <SectionHeader title="Certificações" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+                                {data.certifications && data.certifications.map(cert => (
+                                    <ListItem 
+                                        key={cert.id}
+                                        title={cert.name}
+                                        subtitle={cert.issuer}
+                                        date={cert.year}
+                                    />
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 4. Cursos Relevantes */}
+                        <section>
+                            <SectionHeader title="Cursos Relevantes" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+                                {data.courses && data.courses.map(course => (
+                                    <ListItem 
+                                        key={course.id}
+                                        title={course.title}
+                                        subtitle={course.institution}
+                                        date={course.year}
+                                    />
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 5. Experiência Profissional */}
+                        <section>
+                            <SectionHeader title="Experiência Profissional" />
+                            
+                            <div className="space-y-8">
+                                {data.experiences.map((exp) => (
+                                    <div key={exp.id} className="flex items-start gap-4">
+                                        <Circle className="mt-1.5 shrink-0 text-primary dark:text-primary-dark" size={14} strokeWidth={3} />
+                                        <div>
+                                            <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">
+                                                {exp.role}
+                                            </h3>
+                                            <div className="text-sm text-gray-600 dark:text-gray-400 font-medium mt-0.5 mb-2">
+                                                {exp.company} <span className="text-gray-300 dark:text-gray-600 mx-2">|</span> {exp.period}
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl">
+                                                {exp.description}
+                                            </p>
                                         </div>
-                                        <h4 className="text-primary dark:text-primary-dark font-medium mb-3">{exp.company}</h4>
-                                        <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                                            {exp.description}
-                                        </p>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                                ))}
+                            </div>
+                        </section>
 
-                    {/* Education */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-                            <GraduationCap className="text-primary dark:text-primary-dark" />
-                            Formação Acadêmica
-                        </h2>
-                         <div className="space-y-8 relative pl-2">
-                            {/* Vertical Timeline Line */}
-                            <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-
-                            {data.education && data.education.map((edu, idx) => (
-                                <div key={edu.id} className="relative pl-8">
-                                    <div className="absolute left-0 top-1.5 w-4 h-4 rounded-full bg-white dark:bg-gray-900 border-4 border-primary dark:border-primary-dark"></div>
-                                    <div className="bg-white dark:bg-gray-800 p-5 rounded-std shadow-sm border border-gray-100 dark:border-gray-700">
-                                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
-                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{edu.degree}</h3>
-                                            <span className="text-sm font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block w-fit mt-1 sm:mt-0">
-                                                {edu.period}
-                                            </span>
-                                        </div>
-                                        <p className="text-gray-600 dark:text-gray-300">{edu.institution}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* Certifications */}
-                    <section>
-                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                            <Award className="text-primary dark:text-primary-dark" />
-                            Certificações
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {data.certifications && data.certifications.map(cert => (
-                                <div key={cert.id} className="p-4 bg-white dark:bg-gray-800 rounded-std border border-gray-100 dark:border-gray-700 shadow-sm flex items-start gap-3">
-                                    <div className="p-2 bg-primary/10 dark:bg-primary-dark/10 rounded-lg text-primary dark:text-primary-dark">
-                                        <Award size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-900 dark:text-white leading-tight mb-1">{cert.name}</h3>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">{cert.issuer} • {cert.year}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                        {/* 6. Tecnologias */}
+                        <section>
+                            <SectionHeader title="Tecnologias" />
+                            <div className="flex flex-wrap gap-2">
+                                {data.skills && data.skills.map((skill, index) => (
+                                    <span key={index} className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-md font-medium">
+                                        {skill}
+                                    </span>
+                                ))}
+                            </div>
+                        </section>
+                     </div>
 
                 </div>
             );
@@ -227,14 +265,45 @@ const App: React.FC = () => {
             return (
                 <div>
                     <HeroMobile profile={data.profile} />
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
-                        <Briefcase className="text-primary dark:text-primary-dark" />
-                        Projetos
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {data.projects.map(p => (
-                            <ProjectCard key={p.id} project={p} onClick={setSelectedProject} />
-                        ))}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                            <Briefcase className="text-primary dark:text-primary-dark" />
+                            Projetos
+                        </h2>
+                    </div>
+
+                    {/* Filter Bar */}
+                    <div className="mb-8 overflow-x-auto pb-2 no-scrollbar">
+                        <div className="flex items-center gap-2">
+                            <span className="text-gray-400 mr-2">
+                                <Filter size={18} />
+                            </span>
+                            {allTechnologies.map(tech => (
+                                <button
+                                    key={tech}
+                                    onClick={() => setActiveTechFilter(tech)}
+                                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                                        activeTechFilter === tech
+                                            ? 'bg-primary dark:bg-primary-dark text-white shadow-md'
+                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700'
+                                    }`}
+                                >
+                                    {tech}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500">
+                        {filteredProjects.length > 0 ? (
+                            filteredProjects.map(p => (
+                                <ProjectCard key={p.id} project={p} onClick={setSelectedProject} />
+                            ))
+                        ) : (
+                            <div className="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">
+                                Nenhum projeto encontrado com a tecnologia selecionada.
+                            </div>
+                        )}
                     </div>
                 </div>
             );

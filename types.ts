@@ -35,6 +35,13 @@ export interface Certification {
   year: string;
 }
 
+export interface Course {
+  id: string;
+  title: string;
+  institution: string;
+  year: string;
+}
+
 export interface ProfileData {
   name: string;
   role: string;

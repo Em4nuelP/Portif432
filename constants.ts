@@ -1,7 +1,7 @@
-import { ProfileData, Project, Experience, Education, Certification } from './types';
+import { ProfileData, Project, Experience, Education, Certification, Course } from './types';
 
 export const PROFILE_DATA: ProfileData = {
-  name: "ALEXANDRE SILVA",
+  name: "EMANUEL PEDROSA",
   role: "Especialista em B.I. & Dados",
   bio: "Transformo dados complexos em insights acionáveis através de visualizações limpas e engenharia de dados robusta.",
   avatar: "https://picsum.photos/id/1005/400/400",
@@ -51,6 +51,33 @@ export const CERTIFICATIONS: Certification[] = [
     id: "c3",
     name: "AWS Certified Cloud Practitioner",
     issuer: "Amazon Web Services",
+    year: "2020"
+  }
+];
+
+export const COURSES: Course[] = [
+  {
+    id: "cr1",
+    title: "SQL for Data Science",
+    institution: "Coursera",
+    year: "2021"
+  },
+  {
+    id: "cr2",
+    title: "Machine Learning A-Z",
+    institution: "Udemy",
+    year: "2022"
+  },
+  {
+    id: "cr3",
+    title: "Advanced DAX for Power BI",
+    institution: "SQLBI",
+    year: "2021"
+  },
+  {
+    id: "cr4",
+    title: "Python for Data Analysis",
+    institution: "DataCamp",
     year: "2020"
   }
 ];

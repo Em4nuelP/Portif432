@@ -1,4 +1,4 @@
-import { PROFILE_DATA, PROJECTS, EXPERIENCES, SKILLS, EDUCATION, CERTIFICATIONS } from '../constants';
+import { PROFILE_DATA, PROJECTS, EXPERIENCES, SKILLS, EDUCATION, CERTIFICATIONS, COURSES } from '../constants';
 
 export const fetchPortfolioData = async () => {
   // Currently returning local data directly.
@@ -8,6 +8,7 @@ export const fetchPortfolioData = async () => {
       experiences: EXPERIENCES,
       skills: SKILLS,
       education: EDUCATION,
-      certifications: CERTIFICATIONS
+      certifications: CERTIFICATIONS,
+      courses: COURSES
   };
 };
