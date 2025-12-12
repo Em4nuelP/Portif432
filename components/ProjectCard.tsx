@@ -10,7 +10,7 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) => {
   return (
     <div 
-        className="group relative bg-white dark:bg-gray-800 rounded-std overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-2 border border-gray-100 dark:border-gray-700"
+        className="group relative bg-white dark:bg-gray-800 rounded-std overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
         onClick={() => onClick(project)}
     >
       {/* Image Container */}
@@ -39,7 +39,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) => {
             {project.technologies.slice(0, 3).map((tech, idx) => (
                 <span 
                     key={idx} 
-                    className="text-xs font-medium px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-md"
+                    className="text-xs font-medium px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-std"
                 >
                     {tech}
                 </span>

@@ -81,7 +81,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onBack }) => {
                 <h3 className="text-sm uppercase tracking-wider text-gray-500 font-semibold mb-3">Tecnologias</h3>
                 <div className="flex flex-wrap gap-2">
                     {project.technologies.map((tech) => (
-                        <span key={tech} className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md text-sm">
+                        <span key={tech} className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-std text-sm">
                             {tech}
                         </span>
                     ))}

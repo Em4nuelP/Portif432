@@ -23,7 +23,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onNavigate, theme, t
   };
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 h-[60px] bg-white dark:bg-[#1f2937] border-t border-gray-200 dark:border-gray-800 z-50 flex items-center justify-between px-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 h-[60px] bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 flex items-center justify-between px-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] transition-colors duration-200">
       
       <div className="flex flex-1 justify-around items-center h-full mr-2">
         {navItems.map((item) => {
@@ -56,7 +56,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ currentView, onNavigate, theme, t
             e.currentTarget.blur();
             toggleTheme();
         }}
-        className="ml-2 w-10 h-10 flex items-center justify-center rounded-std text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+        className="ml-2 w-10 h-10 flex items-center justify-center rounded-std text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
       </button>

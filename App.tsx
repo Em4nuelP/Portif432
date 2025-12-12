@@ -79,33 +79,33 @@ const App: React.FC = () => {
     switch (currentView) {
         case 'home':
             return (
-                <div className="space-y-12">
+                <div className="space-y-12 animate-in fade-in duration-300">
                     <HeroMobile profile={data.profile} />
                     
                     <section>
                         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
                             Transformando dados em <span className="text-primary dark:text-primary-dark">estratégia</span>.
                         </h2>
-                        <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl">
+                        <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                             {data.profile.bio}
                         </p>
                     </section>
 
                     <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="p-6 bg-white dark:bg-gray-800 rounded-std shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="p-6 bg-white dark:bg-gray-800 rounded-std shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                             <Database className="text-primary dark:text-primary-dark mb-4" size={32} />
-                            <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">Engenharia de Dados</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Pipelines ETL robustos, modelagem dimensional e armazéns de dados.</p>
+                            <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">Análise de Dados</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">SQL, Python e técnicas de análise para responder perguntas de negócio e apoiar decisões.</p>
                         </div>
-                        <div className="p-6 bg-white dark:bg-gray-800 rounded-std shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="p-6 bg-white dark:bg-gray-800 rounded-std shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                             <LineChart className="text-primary dark:text-primary-dark mb-4" size={32} />
                             <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">Business Intelligence</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Dashboards interativos, storytelling com dados e KPIs estratégicos.</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Criação de KPIs estratégicos e visualizações intuitivas com foco na experiência do usuário.</p>
                         </div>
-                        <div className="p-6 bg-white dark:bg-gray-800 rounded-std shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="p-6 bg-white dark:bg-gray-800 rounded-std shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                             <Code className="text-primary dark:text-primary-dark mb-4" size={32} />
-                            <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">Automação</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Scripts Python/SQL para automatizar relatórios e processos manuais.</p>
+                            <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">Automação & Eficiência</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Scripts em Python/SQL para automatizar processos e relatórios.</p>
                         </div>
                     </section>
 
@@ -171,7 +171,7 @@ const App: React.FC = () => {
                      <div className="space-y-12">
                         {/* 1. Resumo */}
                         <section>
-                            <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed text-justify">
+                            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed text-justify">
                                 {data.profile.bio} Tenho forte background em análise estatística e desenvolvimento de soluções de dados escaláveis. Meu foco é entregar valor real ao negócio, garantindo integridade e acessibilidade da informação.
                             </p>
                         </section>
@@ -221,36 +221,12 @@ const App: React.FC = () => {
                             </div>
                         </section>
 
-                        {/* 5. Experiência Profissional */}
-                        <section>
-                            <SectionHeader title="Experiência Profissional" />
-                            
-                            <div className="space-y-8">
-                                {data.experiences.map((exp) => (
-                                    <div key={exp.id} className="flex items-start gap-4">
-                                        <Circle className="mt-1.5 shrink-0 text-primary dark:text-primary-dark" size={14} strokeWidth={3} />
-                                        <div>
-                                            <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">
-                                                {exp.role}
-                                            </h3>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400 font-medium mt-0.5 mb-2">
-                                                {exp.company} <span className="text-gray-300 dark:text-gray-600 mx-2">|</span> {exp.period}
-                                            </div>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-3xl">
-                                                {exp.description}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* 6. Tecnologias */}
+                        {/* 5. Tecnologias (Renumerado após remoção de experiência) */}
                         <section>
                             <SectionHeader title="Tecnologias" />
                             <div className="flex flex-wrap gap-2">
                                 {data.skills && data.skills.map((skill, index) => (
-                                    <span key={index} className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-md font-medium">
+                                    <span key={index} className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-std font-medium border border-gray-100 dark:border-gray-700">
                                         {skill}
                                     </span>
                                 ))}
@@ -282,7 +258,7 @@ const App: React.FC = () => {
                                 <button
                                     key={tech}
                                     onClick={() => setActiveTechFilter(tech)}
-                                    className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                                    className={`whitespace-nowrap px-4 py-2 rounded-std text-sm font-medium transition-all duration-200 ${
                                         activeTechFilter === tech
                                             ? 'bg-primary dark:bg-primary-dark text-white shadow-md'
                                             : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-100 dark:border-gray-700'
@@ -310,7 +286,7 @@ const App: React.FC = () => {
 
         case 'contact':
             return (
-                <div className="max-w-xl">
+                <div className="max-w-xl animate-in fade-in duration-300">
                     <HeroMobile profile={data.profile} />
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center gap-3">
                         <Mail className="text-primary dark:text-primary-dark" />
@@ -326,7 +302,7 @@ const App: React.FC = () => {
                                 <Mail size={24} />
                             </div>
                             <span className="text-lg font-medium text-gray-800 dark:text-gray-200">
-                                {data.profile.social.email}
+                                Email
                             </span>
                         </a>
 

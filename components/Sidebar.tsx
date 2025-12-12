@@ -20,7 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
   ] as const;
 
   return (
-    <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-white dark:bg-[#1f2937] border-r border-gray-200 dark:border-gray-800 z-50">
+    <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 transition-colors duration-200">
       
       {/* Header with Banner & Profile */}
       <div className="relative mb-14">
@@ -31,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
             <img 
                 src={profile.avatar} 
                 alt="Profile" 
-                className="w-24 h-24 rounded-std border-4 border-white dark:border-[#1f2937] shadow-md object-cover"
+                className="w-24 h-24 rounded-std border-4 border-white dark:border-gray-800 shadow-md object-cover bg-white dark:bg-gray-800"
             />
         </div>
       </div>
@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-std transition-all duration-200 group ${
                 isActive 
                   ? 'bg-primary dark:bg-primary-dark text-white shadow-sm' 
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             >
               <Icon 
@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
       </nav>
 
       {/* Footer */}
-      <div className="p-6 border-t border-gray-100 dark:border-gray-800">
+      <div className="p-6 border-t border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between">
             <div className="flex space-x-3">
                 <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors">
@@ -83,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
             </div>
             <button 
                 onClick={toggleTheme}
-                className="p-2 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 aria-label="Toggle Theme"
             >
                 {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}

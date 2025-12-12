@@ -2,14 +2,16 @@ import { ProfileData, Project, Experience, Education, Certification, Course } fr
 
 export const PROFILE_DATA: ProfileData = {
   name: "EMANUEL PEDROSA",
-  role: "Especialista em B.I. & Dados",
-  bio: "Transformo dados complexos em insights acionáveis através de visualizações limpas e engenharia de dados robusta.",
-  avatar: "https://picsum.photos/id/1005/400/400",
-  banner: "https://picsum.photos/id/197/800/300",
+  role: "Analista de B.I.",
+  bio: "Traduzo dados complexos em insights acionáveis por meio de análises estruturadas e visualizações focadas na experiência do usuário, garantindo que cada dashboard conte uma história clara e útil para a tomada de decisão.",
+  // Link otimizado para CDN do Google (lh3)
+  avatar: "https://lh3.googleusercontent.com/d/1kRtL4O8chfp8QFHE_LFFSWyIfZ5weo4P",
+  // Link otimizado para CDN do Google (lh3)
+  banner: "https://lh3.googleusercontent.com/d/1qcDlCJC0SCChNCttDRktlwVazsqltwm0",
   social: {
     linkedin: "https://linkedin.com",
     github: "https://github.com",
-    email: "contato@alexandresilva.dev"
+    email: "contato@emanuelpedrosa.dev"
   }
 };
 
