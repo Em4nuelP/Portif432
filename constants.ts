@@ -1,9 +1,12 @@
+
 import { ProfileData, Project, Experience, Education, Certification, Course } from './types';
 
+// Fix: added missing 'aboutText' property to match ProfileData interface
 export const PROFILE_DATA: ProfileData = {
-  name: "EMANUEL PEDROSA",
+  name: "Emanuel Pedrosa",
   role: "Analista de B.I.",
   bio: "Traduzo dados complexos em insights acionáveis por meio de análises estruturadas e visualizações focadas na experiência do usuário, garantindo que cada dashboard conte uma história clara e útil para a tomada de decisão.",
+  aboutText: "Analista de Business Intelligence apaixonado por transformar dados em conhecimento estratégico. Com sólida experiência em Power BI, SQL e Python, foco em criar soluções de análise que otimizam processos e facilitam a tomada de decisão baseada em evidências.",
   // Link otimizado para CDN do Google (lh3)
   avatar: "https://lh3.googleusercontent.com/d/1kRtL4O8chfp8QFHE_LFFSWyIfZ5weo4P",
   // Link otimizado para CDN do Google (lh3)

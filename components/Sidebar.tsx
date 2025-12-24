@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Home, User, Briefcase, Mail, Moon, Sun, Github, Linkedin } from 'lucide-react';
 import { ViewState, Theme, ProfileData } from '../types';
@@ -24,25 +25,30 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
       
       {/* Header with Banner & Profile */}
       <div className="relative mb-14">
-        <div className="h-24 w-full overflow-hidden">
-            <img src={profile.banner} alt="Banner" className="w-full h-full object-cover" />
+        <div className="h-24 w-full overflow-hidden bg-gray-100 dark:bg-gray-900">
+            <img 
+                src={profile.banner || "https://placehold.co/400x100?text=Banner"} 
+                alt="" 
+                className="w-full h-full object-cover" 
+                loading="eager"
+            />
         </div>
         <div className="absolute top-12 left-6">
             <img 
-                src={profile.avatar} 
-                alt="Profile" 
+                src={profile.avatar || "https://placehold.co/100x100?text=Avatar"} 
+                alt={profile.name} 
                 className="w-24 h-24 rounded-std border-4 border-white dark:border-gray-800 shadow-md object-cover bg-white dark:bg-gray-800"
             />
         </div>
       </div>
 
       <div className="px-6 mb-8">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white uppercase tracking-tight leading-none mb-1">
-            {profile.name}
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight mb-1">
+            {profile.name || "Carregando..."}
         </h1>
-        <span className="text-sm font-semibold text-primary dark:text-primary-dark uppercase tracking-wide">
+        <p className="text-sm font-semibold text-primary dark:text-primary-dark tracking-wide">
             {profile.role}
-        </span>
+        </p>
       </div>
 
       {/* Navigation */}
@@ -74,12 +80,16 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onNavigate, theme, toggl
       <div className="p-6 border-t border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between">
             <div className="flex space-x-3">
-                <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors">
-                    <Linkedin size={20} />
-                </a>
-                <a href={profile.social.github} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors">
-                    <Github size={20} />
-                </a>
+                {profile.social.linkedin && (
+                  <a href={profile.social.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors" aria-label="LinkedIn">
+                      <Linkedin size={20} />
+                  </a>
+                )}
+                {profile.social.github && (
+                  <a href={profile.social.github} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary dark:hover:text-primary-dark transition-colors" aria-label="GitHub">
+                      <Github size={20} />
+                  </a>
+                )}
             </div>
             <button 
                 onClick={toggleTheme}

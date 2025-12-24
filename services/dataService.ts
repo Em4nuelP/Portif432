@@ -1,25 +1,29 @@
-import { PROFILE_DATA, PROJECTS, EXPERIENCES, SKILLS, EDUCATION, CERTIFICATIONS, COURSES } from '../constants';
-import { Education, Certification, Course, Project } from '../types';
 
-// 1. URL Tecnologias (GID=0)
+import { Education, Certification, Course, Project, ProfileData } from '../types';
+
+const CACHE_KEY = 'portfolio_data_v1';
+const CACHE_EXPIRATION = 1000 * 60 * 1; // 1 minuto de cache
+
+// URLs das Planilhas do Google Sheets
 const TECHS_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2u7fnxCwSYJ8olyFdS_qkBV6BRO2jdbYdCUtx5I7VYKluol3de2-4m_XWQ-MH9Xiaz-eJ9U0rmbjt/pub?gid=0&single=true&output=csv";
-
-// 2. URL Perfil / Home (GID=1712267852)
 const PROFILE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2u7fnxCwSYJ8olyFdS_qkBV6BRO2jdbYdCUtx5I7VYKluol3de2-4m_XWQ-MH9Xiaz-eJ9U0rmbjt/pub?gid=1712267852&single=true&output=csv";
-
-// 3. URL Sobre Mim (GID=1886962865)
 const ABOUT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2u7fnxCwSYJ8olyFdS_qkBV6BRO2jdbYdCUtx5I7VYKluol3de2-4m_XWQ-MH9Xiaz-eJ9U0rmbjt/pub?gid=1886962865&single=true&output=csv";
-
-// 4. URL Contato (GID=1275760528)
 const CONTACT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2u7fnxCwSYJ8olyFdS_qkBV6BRO2jdbYdCUtx5I7VYKluol3de2-4m_XWQ-MH9Xiaz-eJ9U0rmbjt/pub?gid=1275760528&single=true&output=csv";
-
-// 5. URL Projetos (GID=1758572421)
 const PROJECTS_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2u7fnxCwSYJ8olyFdS_qkBV6BRO2jdbYdCUtx5I7VYKluol3de2-4m_XWQ-MH9Xiaz-eJ9U0rmbjt/pub?gid=1758572421&single=true&output=csv";
+const TEXTS_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2u7fnxCwSYJ8olyFdS_qkBV6BRO2jdbYdCUtx5I7VYKluol3de2-4m_XWQ-MH9Xiaz-eJ9U0rmbjt/pub?gid=554370619&single=true&output=csv";
 
-// Função utilitária para limpar e ajustar links
+const cleanString = (str: string): string => {
+    if (!str) return "";
+    return str
+        .replace(/\uFEFF/g, "")
+        .replace(/\uFFFD/g, "")
+        .replace(/\r/g, "")
+        .trim();
+};
+
 const normalizeUrl = (rawUrl: string | undefined): string => {
     if (!rawUrl) return "";
-    let url = rawUrl.replace(/["']/g, '').trim();
+    let url = cleanString(rawUrl).replace(/["']/g, '');
 
     if (url.includes('drive.google.com')) {
         let idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -35,219 +39,193 @@ const normalizeUrl = (rawUrl: string | undefined): string => {
     return url;
 };
 
-// Função auxiliar para processar CSV respeitando aspas
 const splitCSVLine = (line: string) => {
     const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-    return parts.map(p => p.replace(/^"|"$/g, '').trim());
+    return parts.map(p => cleanString(p.replace(/^"|"$/g, '')));
 };
 
-export const fetchPortfolioData = async () => {
-  let profile = { ...PROFILE_DATA };
-  let newEducation: Education[] = [];
-  let newCertifications: Certification[] = [];
-  let newCourses: Course[] = [];
-  let newSkills: string[] = [];
-  let newProjects: Project[] = [];
+const fetchSafe = async (url: string): Promise<string> => {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return "";
+        let text = await response.text();
+        return cleanString(text);
+    } catch (error) {
+        console.warn(`Erro ao carregar dados da URL: ${url}`, error);
+        return "";
+    }
+};
 
-  // Chaves reservadas para ignorar na lista de skills (caso tenham sobrado na aba antiga)
-  const ignoredSkillKeys = ['avatar', 'banner', 'bio', 'name', 'role', 'linkedin', 'github', 'email', 'social', 'technologies', 'tecnologias', 'key', 'value'];
+export const fetchPortfolioData = async (ignoreCache = false) => {
+    if (!ignoreCache) {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < CACHE_EXPIRATION) {
+                return data;
+            }
+        }
+    }
 
-  // 1. BUSCAR PERFIL (NOVO GID)
-  try {
-      const response = await fetch(PROFILE_SHEET_URL);
-      if (response.ok) {
-          const text = await response.text();
-          const lines = text.split('\n');
-          
-          lines.forEach(line => {
-              if (!line) return;
-              const parts = splitCSVLine(line);
-              if (parts.length < 2) return; // Precisa de chave e valor
+    const [profileText, techsText, aboutText, contactText, projectsText, extraTexts] = await Promise.all([
+        fetchSafe(PROFILE_SHEET_URL),
+        fetchSafe(TECHS_SHEET_URL),
+        fetchSafe(ABOUT_SHEET_URL),
+        fetchSafe(CONTACT_SHEET_URL),
+        fetchSafe(PROJECTS_SHEET_URL),
+        fetchSafe(TEXTS_SHEET_URL)
+    ]);
 
-              const keyLower = parts[0].toLowerCase().replace(/:/g, '').trim();
-              const value = parts[1];
+    let profile: ProfileData = { 
+        name: "", 
+        role: "", 
+        bio: "", 
+        aboutText: "",
+        avatar: "", 
+        banner: "", 
+        social: { linkedin: "", github: "", email: "" } 
+    };
+    
+    let newEducation: Education[] = [];
+    let newCertifications: Certification[] = [];
+    let newCourses: Course[] = [];
+    let newSkills: string[] = [];
+    let newProjects: Project[] = [];
 
-              if (!value) return;
+    const ignoredSkillKeys = ['avatar', 'banner', 'bio', 'name', 'nome', 'role', 'cargo', 'linkedin', 'github', 'email', 'social', 'technologies', 'tecnologias', 'key', 'value', 'sobre'];
 
-              if (keyLower === 'avatar') {
-                  const url = normalizeUrl(value);
-                  if (url.startsWith('http')) profile.avatar = url;
-              }
-              else if (keyLower === 'banner') {
-                  const url = normalizeUrl(value);
-                  if (url.startsWith('http')) profile.banner = url;
-              }
-              else if (keyLower === 'bio') profile.bio = value;
-              else if (keyLower === 'name') profile.name = value;
-              else if (keyLower === 'role') profile.role = value;
-              // Os contatos serão carregados prioritariamente da aba 4, mas mantemos aqui como fallback
-              else if (keyLower === 'linkedin') profile.social.linkedin = value;
-              else if (keyLower === 'github') profile.social.github = value;
-              else if (keyLower === 'email') profile.social.email = value;
-          });
-      }
-  } catch (error) {
-      console.warn("Erro ao carregar Perfil:", error);
-  }
+    // Processamento da aba de textos (Bio, Sobre, Nome, Cargo)
+    if (extraTexts) {
+        extraTexts.split('\n').forEach(line => {
+            const trimmedLine = cleanString(line);
+            if (!trimmedLine) return;
+            const parts = splitCSVLine(trimmedLine);
+            if (parts.length < 2) return;
+            const keyLower = parts[0].toLowerCase().replace(/:/g, '').trim();
+            const value = parts[1];
+            if (!value) return;
 
-  // 2. BUSCAR TECNOLOGIAS (GID 0)
-  try {
-      const response = await fetch(TECHS_SHEET_URL);
-      if (response.ok) {
-          const text = await response.text();
-          const lines = text.split('\n');
-          
-          lines.forEach(line => {
-              if (!line) return;
-              const parts = splitCSVLine(line);
-              if (parts.length < 1) return;
+            if (keyLower === 'bio') profile.bio = value;
+            else if (keyLower === 'sobre') profile.aboutText = value;
+            else if (keyLower === 'nome' || keyLower === 'name') profile.name = value;
+            else if (keyLower === 'cargo' || keyLower === 'role') profile.role = value;
+        });
+    }
 
-              const possibleSkill = parts[0].trim();
-              const possibleKeyCheck = possibleSkill.toLowerCase();
+    // Processamento da aba de perfil (Avatar, Banner, Social, e Nome/Cargo se não preenchidos acima)
+    if (profileText) {
+        profileText.split('\n').forEach(line => {
+            const trimmedLine = cleanString(line);
+            if (!trimmedLine) return;
+            const parts = splitCSVLine(trimmedLine);
+            if (parts.length < 2) return;
+            const keyLower = parts[0].toLowerCase().replace(/:/g, '').trim();
+            const value = parts[1];
+            if (!value) return;
 
-              // Se não for vazio e não for uma chave de configuração antiga
-              if (possibleSkill && !ignoredSkillKeys.includes(possibleKeyCheck)) {
-                  newSkills.push(possibleSkill);
-              }
-          });
-      }
-  } catch (error) {
-      console.warn("Erro ao carregar Tecnologias:", error);
-  }
+            if (keyLower === 'avatar') profile.avatar = normalizeUrl(value);
+            else if (keyLower === 'banner') profile.banner = normalizeUrl(value);
+            else if ((keyLower === 'name' || keyLower === 'nome') && !profile.name) profile.name = value;
+            else if ((keyLower === 'role' || keyLower === 'cargo') && !profile.role) profile.role = value;
+            else if (keyLower === 'linkedin') profile.social.linkedin = value;
+            else if (keyLower === 'github') profile.social.github = value;
+            else if (keyLower === 'email') profile.social.email = value;
+            else if (keyLower === 'bio' && !profile.bio) profile.bio = value;
+        });
+    }
 
-  // 3. BUSCAR DADOS SOBRE MIM (GID 188...)
-  try {
-      const response = await fetch(ABOUT_SHEET_URL);
-      if (response.ok) {
-          const text = await response.text();
-          const lines = text.split('\n');
-          
-          lines.forEach((line, index) => {
-              if (!line) return;
-              const parts = splitCSVLine(line);
-              
-              if (parts.length < 2) return;
+    if (techsText) {
+        techsText.split('\n').forEach(line => {
+            const trimmedLine = cleanString(line);
+            if (!trimmedLine) return;
+            const parts = splitCSVLine(trimmedLine);
+            if (parts.length < 1) return;
+            const possibleSkill = parts[0];
+            if (possibleSkill && !ignoredSkillKeys.includes(possibleSkill.toLowerCase())) {
+                newSkills.push(possibleSkill);
+            }
+        });
+    }
 
-              const type = parts[0].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
-              const colB = parts[1] || "";
-              const colC = parts[2] || "";
-              const colD = parts[3] || "";
+    if (aboutText) {
+        aboutText.split('\n').forEach((line, index) => {
+            const trimmedLine = cleanString(line);
+            if (!trimmedLine) return;
+            const parts = splitCSVLine(trimmedLine);
+            if (parts.length < 2) return;
+            const type = parts[0].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+            const colB = parts[1] || "";
+            const colC = parts[2] || "";
+            const colD = parts[3] || "";
 
-              if (type === 'formacao') {
-                  newEducation.push({
-                      id: `edu-sheet-${index}`,
-                      degree: colB,
-                      institution: colC,
-                      period: colD
-                  });
-              }
-              else if (type === 'certificacao') {
-                  newCertifications.push({
-                      id: `cert-sheet-${index}`,
-                      name: colB,
-                      issuer: colC,
-                      year: colD
-                  });
-              }
-              else if (type === 'curso') {
-                  newCourses.push({
-                      id: `course-sheet-${index}`,
-                      title: colB,
-                      institution: colC,
-                      year: colD
-                  });
-              }
-          });
-      }
-  } catch (error) {
-      console.warn("Erro ao carregar 'Sobre Mim':", error);
-  }
+            if (type === 'formacao') {
+                newEducation.push({ id: `edu-sheet-${index}`, degree: colB, institution: colC, period: colD });
+            } else if (type === 'certificacao') {
+                newCertifications.push({ id: `cert-sheet-${index}`, name: colB, issuer: colC, year: colD });
+            } else if (type === 'curso') {
+                newCourses.push({ id: `course-sheet-${index}`, title: colB, institution: colC, year: colD });
+            }
+        });
+    }
 
-  // 4. BUSCAR CONTATO (GID 127...)
-  try {
-      const response = await fetch(CONTACT_SHEET_URL);
-      if (response.ok) {
-          const text = await response.text();
-          const lines = text.split('\n');
-          
-          lines.forEach(line => {
-              if (!line) return;
-              const parts = splitCSVLine(line);
-              if (parts.length < 2) return; // Type, Contact
+    if (contactText) {
+        contactText.split('\n').forEach(line => {
+            const trimmedLine = cleanString(line);
+            if (!trimmedLine) return;
+            const parts = splitCSVLine(trimmedLine);
+            if (parts.length < 2) return;
+            const type = parts[0].toLowerCase();
+            const value = parts[1];
+            if (!value) return;
 
-              const type = parts[0].toLowerCase().trim();
-              const value = parts[1].trim();
+            if (type.includes('linkedin')) profile.social.linkedin = value;
+            else if (type.includes('github')) profile.social.github = value;
+            else if (type.includes('email')) profile.social.email = value;
+        });
+    }
 
-              if (!value) return;
+    if (projectsText) {
+        projectsText.split('\n').forEach((line, index) => {
+            const trimmedLine = cleanString(line);
+            if (!trimmedLine) return;
+            const parts = splitCSVLine(trimmedLine);
+            const title = parts[0];
+            if (!title || title.toLowerCase().replace(':', '').trim() === 'title') return;
 
-              if (type.includes('linkedin')) profile.social.linkedin = value;
-              else if (type.includes('github')) profile.social.github = value;
-              else if (type.includes('email')) profile.social.email = value;
-          });
-      }
-  } catch (error) {
-      console.warn("Erro ao carregar Contato:", error);
-  }
+            const category = parts[1] || "Geral";
+            const technologies = parts[2] ? parts[2].split(',').map(t => cleanString(t)).filter(Boolean) : [];
+            const description = parts[3] || "";
+            const link = parts[4];
+            const images = [normalizeUrl(parts[5]), normalizeUrl(parts[6]), normalizeUrl(parts[7])].filter(Boolean);
+            const thumbnail = images[0] || "https://placehold.co/600x400?text=No+Image";
 
-  // 5. BUSCAR PROJETOS (GID 175...)
-  try {
-      const response = await fetch(PROJECTS_SHEET_URL);
-      if (response.ok) {
-          const text = await response.text();
-          const lines = text.split('\n');
-          
-          lines.forEach((line, index) => {
-              if (!line) return;
-              const parts = splitCSVLine(line);
-              
-              // Verifica se tem título (Col A)
-              const title = parts[0]?.trim();
-              
-              // Pula se título vazio ou for o cabeçalho
-              // Normalizamos removendo ':' para garantir que 'title:' ou 'title' sejam pegos
-              if (!title || title.toLowerCase().replace(':', '').trim() === 'title') return;
+            newProjects.push({
+                id: `proj-sheet-${index}`,
+                title,
+                category,
+                technologies,
+                description,
+                link: link || undefined,
+                thumbnail,
+                images: images.length > 0 ? images : [thumbnail]
+            });
+        });
+    }
 
-              const category = parts[1]?.trim() || "Geral";
-              // Tecnologias (Col C) - separadas por vírgula
-              const technologies = parts[2] ? parts[2].split(',').map(t => t.trim()).filter(Boolean) : [];
-              const description = parts[3]?.trim() || "";
-              const link = parts[4]?.trim();
+    const result = {
+        profile,
+        projects: newProjects,
+        experiences: [],
+        skills: Array.from(new Set(newSkills)),
+        education: newEducation,
+        certifications: newCertifications,
+        courses: newCourses
+    };
 
-              // Imagens (Col F, G, H)
-              const img1 = normalizeUrl(parts[5]);
-              const img2 = normalizeUrl(parts[6]);
-              const img3 = normalizeUrl(parts[7]);
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+        data: result,
+        timestamp: Date.now()
+    }));
 
-              const images = [img1, img2, img3].filter(Boolean);
-              
-              // Thumbnail: usa image1, ou um placeholder se não existir
-              const thumbnail = img1 || "https://placehold.co/600x400?text=No+Image";
-
-              newProjects.push({
-                  id: `proj-sheet-${index}`,
-                  title,
-                  category,
-                  technologies,
-                  description,
-                  link: link || undefined,
-                  thumbnail,
-                  images: images.length > 0 ? images : [thumbnail]
-              });
-          });
-      }
-  } catch (error) {
-      console.warn("Erro ao carregar Projetos:", error);
-  }
-
-  const uniqueSkills = Array.from(new Set(newSkills));
-
-  return {
-      profile: profile,
-      projects: newProjects.length > 0 ? newProjects : PROJECTS,
-      experiences: EXPERIENCES,
-      skills: uniqueSkills.length > 0 ? uniqueSkills : SKILLS,
-      education: newEducation.length > 0 ? newEducation : EDUCATION,
-      certifications: newCertifications.length > 0 ? newCertifications : CERTIFICATIONS,
-      courses: newCourses.length > 0 ? newCourses : COURSES
-  };
+    return result;
 };

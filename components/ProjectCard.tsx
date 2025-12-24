@@ -14,11 +14,13 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onClick }) => {
         onClick={() => onClick(project)}
     >
       {/* Image Container */}
-      <div className="aspect-video w-full overflow-hidden relative">
+      <div className="aspect-video w-full overflow-hidden relative bg-gray-100 dark:bg-gray-900">
         <img 
             src={project.thumbnail} 
             alt={project.title} 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
+            decoding="async"
         />
         
         {/* Overlay */}

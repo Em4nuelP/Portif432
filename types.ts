@@ -1,3 +1,4 @@
+
 export type Theme = 'light' | 'dark';
 
 export type ViewState = 'home' | 'about' | 'projects' | 'contact';
@@ -46,6 +47,7 @@ export interface ProfileData {
   name: string;
   role: string;
   bio: string;
+  aboutText: string;
   avatar: string;
   banner: string;
   social: {
